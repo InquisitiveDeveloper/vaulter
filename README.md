@@ -1,115 +1,344 @@
 # Vault Secret Management UI
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+A modern, production-grade Next.js application for managing secrets across multiple HashiCorp Vault instances with OIDC authentication, granular access control, and comprehensive secret management capabilities.
 
-A Next.js web application providing a user-friendly interface to manage secrets stored in HashiCorp Vault across multiple environments and namespaces.
+## 🌟 Features
 
-## Features
+### Implemented (Phases 1-2 Complete, Phase 3 In Progress)
 
-*   **Multi-Environment & Namespace:** Manage connections to different Vault instances or namespaces categorized by environment (Dev, Staging, Prod, etc.).
-*   **Application-Centric View:** Organize secrets based on logical applications, mapping to specific Vault paths.
-*   **KV Secret Management:** Full CRUD operations (Create, Read, Update, Delete) for Key-Value (KV V2) secrets.
-*   **Secret Comparison:** Compare secret values for the same application across selected environments/namespaces, highlighting differences.
-*   **Secret Copying:** Easily copy individual secrets or entire application secret sets between environments/namespaces.
-*   **Secret Version History:** View and inspect previous versions of secrets stored in Vault's KV V2 engine.
-*   **Bulk Import/Export:** Upload secrets from a file (JSON/CSV) or download existing secrets for backup or migration.
-*   **Granular Access Control:** Define user groups and assign specific permissions (view, edit, delete, lock, manage apps, view audit logs, etc.) per environment via an Access Matrix UI.
-*   **OIDC Authentication:** Secure the application using OpenID Connect for user login, mapping OIDC groups to internal application groups.
-*   **Audit Logging:** Comprehensive logging of user actions (who, what, when, target resource) for security and compliance. Includes a dedicated UI to view audit trails.
-*   **Modern UI:** Built with Next.js 15, Tailwind CSS, and Shadcn/ui.
+- ✅ **OIDC Authentication** - Secure login with OpenID Connect or development credentials
+- ✅ **Environment Management** - Configure multiple Vault instances
+- ✅ **Namespace Support** - Manage Vault namespaces per environment
+- ✅ **Application Paths** - Define logical application secret paths
+- ✅ **Vault Connection Testing** - Verify connectivity before deployment
+- ✅ **Encrypted Credentials** - Secure storage of Vault credentials
+- ✅ **Dark Mode** - Beautiful UI with light/dark theme support
+- ✅ **Responsive Design** - Works on desktop, tablet, and mobile
+- ⏳ **Secret Management** - CRUD operations on secrets (API complete, UI pending)
 
-## Tech Stack
+### Planned Features
 
-*   **Framework:** Next.js 15 (App Router)
-*   **Styling:** Tailwind CSS
-*   **UI Components:** Shadcn/ui
-*   **Authentication:** NextAuth.js (OIDC Provider)
-*   **Database ORM:** Prisma
-*   **Vault Interaction:** node-vault
-*   **Language:** TypeScript
+- ⏳ Secret lock/unlock (redaction)
+- ⏳ Version history viewer
+- ⏳ Access control matrix
+- ⏳ Secret comparison across environments
+- ⏳ Bulk import/export
+- ⏳ Comprehensive audit logging
 
-## Prerequisites
+## 🚀 Quick Start
 
-*   Node.js (Check `.nvmrc` or specify version, e.g., v18+)
-*   npm, yarn, or pnpm
-*   Access to a HashiCorp Vault instance (v1.x+)
-*   An OIDC Provider (e.g., Keycloak, Okta, Google, Auth0) configured for this application.
-*   A database instance (PostgreSQL, SQL Server, or SQLite file).
+### Prerequisites
 
-## Getting Started
+- Node.js 18+ and npm
+- A HashiCorp Vault instance (or use development mode)
+- (Optional) OIDC provider for production authentication
 
-1.  **Clone the repository:**
-    ```bash
-    git clone <your-repository-url>
-    cd <repository-directory>
-    ```
+### Installation
 
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    # or
-    yarn install
-    # or
-    pnpm install
-    ```
+1. **Clone and install dependencies**:
 
-3.  **Set up Environment Variables:**
-    Copy the example environment file:
-    ```bash
-    cp .env.example .env.local
-    ```
-    Edit `.env.local` and fill in the required values:
+```bash
+cd vault-secret-ui
+npm install
+```
 
-    ```dotenv
-    # Database
-    # Example for PostgreSQL: postgresql://user:password@host:port/database?schema=public
-    # Example for SQLite: file:./dev.db
-    # Example for SQL Server: sqlserver://host:port;database=dbname;user=user;password=password;encrypt=true;trustServerCertificate=false;
-    DATABASE_URL="your_database_connection_string"
+2. **Create environment file**:
 
-    # NextAuth.js Configuration
-    NEXTAUTH_URL="http://localhost:3000" # Replace with your deployed URL in production
-    NEXTAUTH_SECRET="generate_a_strong_secret_key" # Run `openssl rand -base64 32`
+Create a `.env` file in the `vault-secret-ui` directory:
 
-    # OIDC Provider Configuration (replace with your provider's details)
-    # Example using a generic OIDC provider in NextAuth.js:
-    OIDC_CLIENT_ID="your_oidc_client_id"
-    OIDC_CLIENT_SECRET="your_oidc_client_secret"
-    OIDC_ISSUER="your_oidc_issuer_url" # e.g., https://your-keycloak-domain/realms/your-realm
-    # Optional: Specify OIDC claim containing user groups for authorization mapping
-    OIDC_GROUPS_CLAIM="groups" # Adjust if your provider uses a different claim name
+```env
+# Database Configuration - SQLite for development
+DATABASE_URL="file:./dev.db"
 
-    # Optional: Define an OIDC group name or user email/subject for the initial Admin
-    # This user/group will be granted full permissions on first login if no admins exist.
-    INITIAL_ADMIN_GROUP="VaultAdmins" # Or use INITIAL_ADMIN_EMAIL or INITIAL_ADMIN_SUBJECT
-    # INITIAL_ADMIN_EMAIL="admin@example.com"
-    # INITIAL_ADMIN_SUBJECT="oidc-subject-of-admin"
+# NextAuth.js Configuration
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-here-minimum-32-characters-required-for-security"
 
-    # Vault connection details are configured via the UI per environment, not here.
-    ```
+# OIDC Provider (Optional - for production)
+# OIDC_CLIENT_ID="your-client-id"
+# OIDC_CLIENT_SECRET="your-client-secret"
+# OIDC_ISSUER="https://your-oidc-provider.com"
 
-4.  **Set up Database:**
-    Run Prisma migrations to create the database schema:
-    ```bash
-    npx prisma migrate dev
-    ```
-    You might be prompted to name the migration (e.g., "init").
+# Application Configuration
+NODE_ENV="development"
+NEXT_PUBLIC_APP_NAME="Vault Secret Management UI"
 
-5.  **Run the development server:**
-    ```bash
-    npm run dev
-    # or
-    yarn dev
-    # or
-    pnpm dev
-    ```
+# Encryption Key (for encrypting Vault credentials)
+ENCRYPTION_KEY="your-encryption-key-minimum-32-characters-very-important"
+```
 
-6.  Open [http://localhost:3000](http://localhost:3000) in your browser. You should be redirected to your OIDC provider for login.
+**Important**: Generate secure random values for `NEXTAUTH_SECRET` and `ENCRYPTION_KEY`:
+```bash
+openssl rand -base64 32
+```
 
-## Running the Application
+3. **Initialize the database**:
 
-*   **Development:** `npm run dev`
-*   **Build:** `npm run build`
-*   **Production Start:** `npm start`
+```bash
+npm run db:push    # Create database tables
+npm run db:seed    # Seed default groups and permissions
+```
 
-## Project Structure (Key Directories)
+4. **Start the development server**:
+
+```bash
+npm run dev
+```
+
+5. **Access the application**:
+
+Open http://localhost:3000 in your browser.
+
+**Development Mode**: Sign in with any email/password combination.
+
+## 📚 Database Configuration
+
+### SQLite (Default - Development)
+
+The project uses SQLite by default for easy local development. The database file is created as `dev.db`.
+
+### PostgreSQL / Supabase (Production)
+
+To use PostgreSQL or Supabase:
+
+1. Update `prisma/schema.prisma`:
+
+```prisma
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")  // Required for Supabase
+}
+```
+
+2. Update your `.env` file:
+
+```env
+DATABASE_URL="postgresql://user:password@host:5432/dbname?pgbouncer=true&connection_limit=1"
+DIRECT_URL="postgresql://user:password@host:5432/dbname"
+```
+
+3. Run migrations:
+
+```bash
+npm run db:push
+npm run db:seed
+```
+
+### MS SQL Server
+
+Update `prisma/schema.prisma`:
+
+```prisma
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+```
+
+## 🔒 Vault Configuration
+
+### Supported Authentication Methods
+
+- **Userpass** - Username and password authentication
+- **AppRole** - Role ID and Secret ID (planned)
+- **Token** - Direct token authentication (planned)
+
+### Adding Your First Vault Environment
+
+1. Navigate to **Environments** in the sidebar
+2. Click **Add Environment**
+3. Fill in the details:
+   - **Name**: e.g., "production", "staging", "dev"
+   - **Vault Address**: e.g., `https://vault.example.com:8200`
+   - **Auth Method**: Select "Username/Password"
+   - **User ID**: Your Vault username
+   - **Password**: Your Vault password (encrypted before storage)
+4. Click **Test Connection** to verify
+5. Save the environment
+
+### Adding Namespaces
+
+1. Go to **Environments** → Select your environment
+2. Switch to the **Namespaces** tab
+3. Click **Add Namespace**
+4. Enter the namespace path (or leave empty for root)
+
+### Adding Applications
+
+1. Navigate to **Applications**
+2. Click **Add Application**
+3. Provide:
+   - **Name**: Friendly name (e.g., "MyWebApp")
+   - **Vault Base Path**: Path in Vault (e.g., "secret/myapp")
+   - **Description**: Optional description
+
+## 🏗️ Architecture
+
+### Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **UI**: Shadcn/ui + Tailwind CSS
+- **Authentication**: NextAuth.js (OIDC + Credentials)
+- **Database**: Prisma ORM (SQLite/PostgreSQL/SQL Server)
+- **Vault Client**: Custom implementation with token caching
+- **Encryption**: AES-256-GCM for sensitive data
+
+### Project Structure
+
+```
+vault-secret-ui/
+├── prisma/
+│   ├── schema.prisma          # Database schema
+│   └── seed.ts                # Default data seeder
+├── src/
+│   ├── app/
+│   │   ├── (dashboard)/       # Protected dashboard routes
+│   │   │   ├── environments/
+│   │   │   ├── applications/
+│   │   │   ├── secrets/       # (UI pending)
+│   │   │   ├── access-control/ # (Pending)
+│   │   │   └── audit-logs/    # (Pending)
+│   │   ├── api/               # API routes
+│   │   │   ├── environments/
+│   │   │   ├── namespaces/
+│   │   │   ├── applications/
+│   │   │   └── secrets/
+│   │   ├── auth/              # Auth pages
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── components/
+│   │   ├── ui/                # Shadcn/ui components
+│   │   ├── layout/            # App layout components
+│   │   ├── environments/
+│   │   ├── namespaces/
+│   │   └── applications/
+│   ├── lib/
+│   │   ├── vault/             # Vault client & operations
+│   │   ├── validations/       # Zod schemas
+│   │   ├── auth.ts            # NextAuth config
+│   │   ├── crypto.ts          # Encryption utilities
+│   │   ├── db-helpers.ts      # Database queries
+│   │   ├── prisma.ts          # Prisma client
+│   │   └── utils.ts           # Utility functions
+│   ├── hooks/                 # React hooks
+│   └── types/                 # TypeScript types
+├── .env                       # Environment variables (create this)
+├── components.json            # Shadcn/ui config
+├── next.config.js
+├── package.json
+├── tailwind.config.ts
+└── tsconfig.json
+```
+
+## 🔐 Security Considerations
+
+### Encryption
+
+- Vault credentials are encrypted using AES-256-GCM before database storage
+- Encryption key must be set via `ENCRYPTION_KEY` environment variable
+- **Never commit** your `.env` file to version control
+
+### Authentication
+
+- OIDC recommended for production
+- Development credentials should only be used in development
+- All routes are protected by NextAuth.js middleware
+
+### Vault Tokens
+
+- Tokens are cached in memory with automatic expiration
+- Token renewal is handled automatically
+- Tokens are never stored in the database
+
+## 📝 Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+
+# Database commands
+npm run db:generate  # Generate Prisma client
+npm run db:push      # Push schema to database
+npm run db:migrate   # Create migration
+npm run db:studio    # Open Prisma Studio
+npm run db:seed      # Seed database
+```
+
+## 🎯 Default Groups & Permissions
+
+The seed script creates three default groups:
+
+### Admin
+- Full access to all features
+- Can manage environments, applications, secrets
+- Can manage access control
+- Can view audit logs
+
+### Developers
+- Can view and edit secrets
+- Can add applications
+- Cannot delete secrets
+- Cannot manage access control
+
+### Viewers
+- Read-only access to secrets
+- Cannot modify anything
+
+## 🐛 Troubleshooting
+
+### Database Connection Issues
+
+**Error**: `Environment variable not found: DATABASE_URL`
+
+**Solution**: Create a `.env` file with `DATABASE_URL="file:./dev.db"`
+
+### Vault Connection Fails
+
+1. Verify Vault is running and accessible
+2. Check the Vault address (include protocol: `https://`)
+3. Verify credentials are correct
+4. Check network connectivity
+5. Ensure Vault namespace is correct (if using Enterprise)
+
+### Authentication Issues
+
+**Development Mode**: Any email/password will work
+**Production**: Ensure OIDC environment variables are set correctly
+
+## 📖 Documentation
+
+- [Implementation Status](./IMPLEMENTATION_STATUS.md) - Track project progress
+- [Prisma Schema](./prisma/schema.prisma) - Database schema documentation
+
+## 🤝 Contributing
+
+This is a custom internal tool. For modifications:
+
+1. Follow the existing code patterns
+2. Update TypeScript types
+3. Add Zod validation for new inputs
+4. Test Vault connectivity before committing
+5. Update IMPLEMENTATION_STATUS.md
+
+## 📄 License
+
+Private/Internal Use
+
+## 🔮 Roadmap
+
+See [IMPLEMENTATION_STATUS.md](./IMPLEMENTATION_STATUS.md) for detailed progress tracking.
+
+**Next Milestones**:
+1. Complete Secret Management UI
+2. Implement secret lock/unlock
+3. Build Access Control interface
+4. Add audit logging
+5. Secret comparison & bulk operations
+
+---
+
+**Built with** Next.js, Prisma, Shadcn/ui, and HashiCorp Vault
